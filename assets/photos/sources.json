@@ -1,0 +1,41 @@
+[
+  {
+    "file": "herring-live-atlantic.jpg",
+    "title": "Herring shoal crowded",
+    "creator": "Axel Kuhlmann",
+    "species": "Clupea harengus (Atlantic herring), source tag",
+    "source_page": "https://www.publicdomainpictures.net/en/view-image.php?image=56679&picture=herring",
+    "download_url": "https://www.publicdomainpictures.net/pictures/60000/velka/heringe.jpg",
+    "license": "CC0 1.0 Universal Public Domain Dedication",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution_required": false,
+    "dimensions": [
+      1920,
+      1310
+    ],
+    "bytes": 685640,
+    "sha256": "37e2b4a082dcf5ebd5daf5f2576a57a3f923d5f4123cc1ea68c87273b31b39e7",
+    "verified_date": "2026-10-21",
+    "verification": "Primary source licensing read; downloaded image visually inspected as a living swimming fish school.",
+    "modification": "None; downloaded photograph unchanged."
+  },
+  {
+    "file": "herring-live-pacific.jpg",
+    "title": "Pacific Herring School",
+    "creator": "Jacob (Jake) Gregg / USGS",
+    "species": "Pacific herring, source title",
+    "source_page": "https://www.usgs.gov/media/images/pacific-herring-school",
+    "download_url": "https://d9-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/s3fs-public/herring_school.JPG",
+    "license": "Public Domain",
+    "license_note": "USGS source explicitly labels this photograph Public Domain. No CC0 claim is made.",
+    "dimensions": [
+      2125,
+      1695
+    ],
+    "bytes": 1977293,
+    "sha256": "dd923451858ddfd004eba672bcd51470f02d2c456e9e9c6353cac28cb795c897",
+    "verified_date": "2026-10-21",
+    "verification": "Primary source licensing read; downloaded image visually inspected as a living swimming fish school.",
+    "modification": "None; downloaded photograph unchanged."
+  }
+]
