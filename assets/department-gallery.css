@@ -1,0 +1,11 @@
+/* Reuse the homepage gallery presentation without changing homepage or game. */
+.department-intro .text-photo-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+.department-copy { max-width: 800px; }
+.department-gallery, .article-gallery .department-gallery { max-width: none; width: 100%; }
+.department-gallery .carousel-viewport { height: clamp(260px, 36vw, 560px); }
+@media (max-width: 650px) {
+  .department-intro .text-photo-layout { gap: 24px; }
+  .department-gallery .carousel-viewport { height: 300px; }
+}
+/* Canteen summaries keep their content, with photography on its own wide row. */
+.two-col > .department-gallery { grid-column: 1 / -1; }
