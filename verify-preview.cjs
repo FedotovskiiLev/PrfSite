@@ -19,9 +19,8 @@ const map={setView(c){center=c;return this;},attributionControl:{setPrefix(p){pr
 const L={map:()=>map,tileLayer:(_url,opts)=>{tileOptions=opts;return {addTo:()=>({on(){}})};}};
 context.window.L=L;context.L=L;
 vm.runInNewContext(fs.readFileSync(__dirname+'/assets/food.js','utf8'),context);
-assert(prefix.includes('https://leafletjs.com'));
-assert(!prefix.includes('<svg')&&!prefix.includes('flag'));
+assert.equal(prefix,false);
 assert(tileOptions.attribution.includes('https://www.openstreetmap.org/copyright'));
 assert(tileOptions.attribution.includes('contributors'));
 assert.deepEqual(center,context.window.FoodMapData.campus.center);
-console.log('PASS: loaded map retains OSM/Leaflet text attribution without flag. DOM adapter only.');
+console.log('PASS: loaded map retains OSM attribution without library prefix. DOM adapter only.');
