@@ -6,10 +6,16 @@ const ribbons=[...html.matchAll(/<path pathLength="1" data-ribbon="([^"]+)"[^>]+
 assert.equal(ribbons.length,7);
 assert.equal(new Set(ribbons.map(r=>r[1])).size,7);
 for(const [,id,color] of ribbons)assert.equal(color,palette[id].accent);
-assert.match(html,/<\/header><div class="home-ribbons" aria-hidden="true">/);
+assert.match(html,/<\/header><div class="home-scene"><div class="home-ribbons" aria-hidden="true">/);
+assert.match(html,/<\/footer><\/div><\/body>/);
+assert.equal((html.match(/V1800"/g)||[]).length,7);
+assert.match(css,/position:absolute;inset:0;z-index:-1/);
+assert.match(css,/height:100%/);
+assert.match(css,/rgba\(255,255,255,\.88\)/);
+assert.match(css,/ribbon-copy-in \.45s ease-out 1\.8s both/);
 assert.match(css,/@media\(prefers-reduced-motion:no-preference\)/);
 assert.doesNotMatch(css,/infinite/);
 assert.match(css,/pointer-events:none/);
 assert.match(css,/@media\(max-width:650px\)/);
 assert.match(html,/<main id="main"/);
-console.log('PASS: seven palette colors, homepage placement, one-shot motion, reduced-motion and mobile rules; navigation preserved.');
+console.log('PASS: seven palette colors, full-page placement, translucent panels, one-shot motion, reduced-motion and mobile rules; navigation preserved.');

@@ -3,8 +3,10 @@
 (function(root){'use strict';
 const ns='http://www.w3.org/2000/svg', layer=document.getElementById('environment'),pattern=document.getElementById('tile-pattern');let cache='';
 function add(parent,tag,attrs){const n=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));parent.appendChild(n);return n}
-// Tint only the retained CC0 floor tile, once. No per-frame filters or asset changes.
-add(pattern,'rect',{x:0,y:0,width:48,height:48,fill:'#3f92ce',opacity:.5,'pointer-events':'none','data-floor-tint':'blue'});
+// The CC0 texture is a 2×2 tile repeat. Tint only alternating tile faces;
+// retain the other two white tiles and the original light grout/texture.
+// These two static shapes are created once, never in the camera update loop.
+for(const offset of [1.5,25.5])add(pattern,'rect',{x:offset,y:offset,width:21,height:21,fill:'#3f92ce',opacity:.5,'pointer-events':'none','data-floor-tint':'blue'});
 function hash(x,y){let n=Math.imul(x,0x1f123bb5)^Math.imul(y,0x5f356495);n^=n>>>16;n=Math.imul(n,0x45d9f3b);return(n^(n>>>16))>>>0}
 function meal(parent,x,y,variant){const g=add(parent,'g',{transform:`translate(${x} ${y}) rotate(${variant?12:-9})`});
  add(g,'ellipse',{cx:.6,cy:1.4,rx:12.2,ry:11.8,fill:'#302820',opacity:.18});

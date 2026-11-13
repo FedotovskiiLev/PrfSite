@@ -1,15 +1,30 @@
-/* Seven department lanes, a single entrance, then a quiet static signature.
-   Homepage-only: subsite headers keep their own department accent. */
+/* Homepage only: seven lanes descend through the entire content canvas.
+   The decoration never receives input; content stays in normal document flow. */
 .home-page .header::after{display:none}
 .home-page .header{border-bottom:0}
-.home-ribbons{height:76px;position:relative;overflow:hidden;pointer-events:none;contain:paint}
-.home-ribbons svg{display:block;width:100%;height:72px}
-.home-ribbons-baseline{position:absolute;inset:auto 0 0;display:flex;height:4px}
-.home-ribbons-baseline span{flex:1}
+.home-scene{position:relative;isolation:isolate}
+.home-ribbons{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:paint}
+.home-ribbons svg{display:block;width:100%;height:100%}
+.home-page .home-main{padding-top:76px}
+.home-page .text-hero>div,.home-page .text-about .about-copy,.home-page #departments .section-heading{
+ background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.6);
+ border-radius:20px;padding:clamp(20px,3vw,40px);box-shadow:0 8px 32px rgba(20,30,40,.025)
+}
+.home-page .text-hero>div{width:100%}
+.home-page #departments .section-heading{padding:20px 28px}
+.home-page .footer{background:rgba(255,255,255,.88)}
 @media(prefers-reduced-motion:no-preference){
- .home-ribbons path{stroke-dasharray:1;stroke-dashoffset:0;animation:ribbon-descend 1.35s cubic-bezier(.3,0,.2,1) var(--ribbon-delay) both}
- .home-ribbons-baseline span{transform:scaleX(1);animation:ribbon-settle .5s cubic-bezier(.2,.6,.3,1) 1.05s both}
+ .home-ribbons path{stroke-dasharray:1;stroke-dashoffset:0;animation:ribbon-descend 1.55s cubic-bezier(.3,0,.2,1) var(--ribbon-delay) both}
+ .home-page .text-hero>div,.home-page .text-about .about-copy,.home-page #departments .section-heading{
+  animation:ribbon-copy-in .45s ease-out 1.8s both
+ }
+ /* Keyboard navigation must never land on an invisible animated panel. */
+ .home-page .text-hero>div:focus-within,.home-page .text-about .about-copy:focus-within{animation:none}
 }
 @keyframes ribbon-descend{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
-@keyframes ribbon-settle{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@media(max-width:650px){.home-ribbons{height:58px}.home-ribbons svg{height:54px}}
+@keyframes ribbon-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:650px){
+ .home-page .home-main{padding-top:42px}
+ .home-page .text-hero>div,.home-page .text-about .about-copy{border-radius:14px;padding:20px}
+ .home-page #departments .section-heading{padding:16px 20px}
+}
