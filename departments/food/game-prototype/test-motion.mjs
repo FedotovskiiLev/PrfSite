@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{createMotionTracker}from './motion-tracker.mjs';
+test('gait advances by actual travelled distance',()=>{let m=createMotionTracker();m.reset({x:0,y:0});assert.equal(m.sample({x:14,y:0,dt:.1}).phase,.5);assert.equal(m.sample({x:28,y:0,dt:.1}).phase,0)});
+test('blocked actor stops, does not cycle',()=>{let m=createMotionTracker();m.reset({x:0,y:0});m.sample({x:1,y:0,dt:.1});let a=m.sample({x:1,y:0,dt:.1});assert.equal(a.moving,false);assert.equal(a.phase,1/28);assert.equal(a.moved,false)});
+test('paused and exhausted actors cannot emit footsteps',()=>{let m=createMotionTracker();m.reset({x:0,y:0});assert.equal(m.sample({x:4,y:0,dt:.1,paused:true}).moved,false);assert.equal(m.sample({x:8,y:0,dt:.1,exhausted:true}).moving,false)});
+test('reset and teleports do not cause bursts',()=>{let m=createMotionTracker();m.reset({x:0,y:0});assert.equal(m.sample({x:900,y:0,dt:.1}).moved,false);m.reset({x:1,y:1});assert.equal(m.sample({x:1,y:1,dt:.1}).phase,0)});
