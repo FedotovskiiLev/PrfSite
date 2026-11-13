@@ -68,7 +68,7 @@ export function createFoodGame(options = {}) {
   if(!Number.isFinite(rareChance)||rareChance<0||rareChance>1)throw new RangeError('rareChance must be 0..1');
   if(typeof random!=='function')throw new TypeError('random must be a function');
   function rng(){const n=random();if(!Number.isFinite(n)||n<0||n>=1)throw new RangeError('random must return [0,1)');return n;}
-  const player={x:0,y:0,radius:playerRadius};
+  const player={x:0,y:0,radius:playerRadius};let travelX=0,travelY=0;
   let eaten=0,tiredSanitizers=0,gingerEaten=0,ticks=0,accumulator=0,serial=0;
   const navigation=createRouteQueue(64);let adoptionWork=0;
   const roaches=[],sanitizers=[];let failure=null,gameOver=false,sanitizerStarted=false,sanitizerTimer=0,sanitizerSerial=0;
@@ -79,7 +79,11 @@ export function createFoodGame(options = {}) {
     // Entire collision circle is outside the current camera rectangle, with a margin.
     const margin=roachRadius+48+Math.max(playerSpeed*step,1);
     const hx=width/2+margin,hy=height/2+margin;
-    const side=Math.floor(rng()*4),along=rng()*2-1,depth=rng()*Math.min(width,height)*.25;
+    // Keep new arrivals ahead of a moving camera, while retaining all-side traffic.
+    let side=Math.floor(rng()*4);
+    const travel=Math.abs(travelX)+Math.abs(travelY);
+    if(travel>1e-6&&rng()<.7)side=rng()<Math.abs(travelX)/travel?(travelX<0?0:1):(travelY<0?2:3);
+    const along=rng()*2-1,depth=rng()*Math.min(64,Math.min(width,height)*.25);
     let x,y;
     if(side===0||side===1){x=(side===0?-1:1)*(hx+depth);y=along*hy;}
     else{x=along*hx;y=(side===2?-1:1)*(hy+depth);}
@@ -151,17 +155,24 @@ export function createFoodGame(options = {}) {
     // Exhausted sanitarians stay seated in the world; thresholds never respawn replacements.
   }
   function recycleFar(){
-    const distance=Math.max(width,height)*2+playerSpeed*3;
+    // A screen-shaped local population, not a huge circular tail several screens behind.
+    // Never recycle a visible actor. A rear actor beyond the near halo cannot keep up
+    // with a running student (roach walk/rest average speed is lower), so reuse it ahead.
+    const halo=220,rearHalo=100;
     for(let i=0;i<roaches.length;i++){
-      const r=roaches[i];
-      if(!visible(r)&&Math.hypot(r.x-player.x,r.y-player.y)>distance)roaches[i]=spawn();
+      const r=roaches[i],x=r.x-player.x,y=r.y-player.y;
+      const outside=Math.abs(x)>width/2+halo||Math.abs(y)>height/2+halo;
+      const trailing=(travelX*x+travelY*y<0)&&
+        ((Math.abs(travelX)>1e-6&&Math.abs(x)>width/2+rearHalo)||
+         (Math.abs(travelY)>1e-6&&Math.abs(y)>height/2+rearHalo));
+      if(!visible(r)&&(outside||trailing))roaches[i]=spawn();
     }
   }
   function tick(input,consumed){
     let dx=input.x,dy=input.y;const length=Math.hypot(dx,dy);if(length>1){dx/=length;dy/=length;}
     const px=player.x,py=player.y;
     const moved=moveWithTables(px,py,px+dx*playerSpeed*step,py+dy*playerSpeed*step,playerRadius);
-    player.x=moved.x;player.y=moved.y;
+    player.x=moved.x;player.y=moved.y;travelX=player.x-px;travelY=player.y-py;
     const intended=Math.hypot(dx,dy)*playerSpeed*step;
     const playerMoveFraction=intended?Math.min(1,Math.hypot(player.x-px,player.y-py)/intended):0;
     const visibleCount=roaches.filter(visible).length;
