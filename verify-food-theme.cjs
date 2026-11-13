@@ -1,0 +1,11 @@
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const css=fs.readFileSync('assets/styles.css','utf8');
+const foodRule=css.match(/body\[data-department="food"\]\{--paper:([^;]+);--line:([^}]+)\}/);
+assert.ok(foodRule,'Food has a scoped cool canvas');
+assert.equal(foodRule[1],'#F7FAFF');
+assert.equal(foodRule[2],'#D4E2F2');
+assert.ok(css.includes('body[data-department="food"] .notice{background:var(--soft)}'));
+assert.ok(css.includes('body[data-department="food"] .food-real-map{background:var(--soft);border-color:var(--line)}'));
+assert.ok(!css.includes('.leaflet-tile{'),'Do not recolor the actual map imagery');
+console.log('PASS: Food cool canvas, notice and map placeholder; map imagery remains untouched.');

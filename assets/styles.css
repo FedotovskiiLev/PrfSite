@@ -40,3 +40,9 @@ body[data-department="travel"] .button:not(.secondary){background:var(--accent);
 .dept-card[data-department] .dept-top,.dept-card[data-department] h3{color:var(--brand)}
 .dept-card[data-department]:hover{background:var(--soft);box-shadow:inset 0 0 0 2px var(--accent)}
 body[data-department] .button.secondary{border-color:var(--brand);color:var(--brand)}
+
+/* Food keeps a cool canvas, including map-loading and empty-state surfaces.
+   Tile imagery retains the map provider's original colors. */
+body[data-department="food"]{--paper:#F7FAFF;--line:#D4E2F2}
+body[data-department="food"] .notice{background:var(--soft)}
+body[data-department="food"] .food-real-map{background:var(--soft);border-color:var(--line)}
