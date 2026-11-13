@@ -1,4 +1,4 @@
-import {createFoodGame} from './food-game-model.mjs';
+import {createFoodGame} from './food-game-model.mjs?v=2';
 import {directional} from './input-math.mjs';
 import {createMotionTracker} from './motion-tracker.mjs';
 import {createDustEffects} from './dust-effects.mjs';
