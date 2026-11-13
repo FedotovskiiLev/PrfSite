@@ -1,6 +1,9 @@
 /* Homepage only: seven lanes descend through the entire content canvas.
    The decoration never receives input; content stays in normal document flow. */
-.home-page .header::after{display:none}
+.home-page .header::after{
+ content:'';display:block;height:4px;
+ background:linear-gradient(to right,#DF3E3E 0 14.285714%,#E34892 14.285714% 28.571429%,#F2CA36 28.571429% 42.857143%,#2F9357 42.857143% 57.142857%,#147AD6 57.142857% 71.428571%,#168B8D 71.428571% 85.714286%,#8853CA 85.714286% 100%)
+}
 .home-page .header{border-bottom:0}
 .home-scene{position:relative;isolation:isolate}
 .home-ribbons{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:paint}
@@ -14,17 +17,54 @@
 .home-page #departments .section-heading{padding:20px 28px}
 .home-page .footer{background:rgba(255,255,255,.88)}
 @media(prefers-reduced-motion:no-preference){
- .home-ribbons path{stroke-dasharray:1;stroke-dashoffset:0;animation:ribbon-descend 1.55s cubic-bezier(.3,0,.2,1) var(--ribbon-delay) both}
+ .home-ribbons svg{animation:ribbon-expand 3s cubic-bezier(.3,0,.2,1) both}
  .home-page .text-hero>div,.home-page .text-about .about-copy,.home-page #departments .section-heading{
-  animation:ribbon-copy-in .45s ease-out 1.8s both
+  animation:ribbon-copy-in .25s ease-out 3s both
  }
  /* Keyboard navigation must never land on an invisible animated panel. */
  .home-page .text-hero>div:focus-within,.home-page .text-about .about-copy:focus-within{animation:none}
 }
-@keyframes ribbon-descend{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes ribbon-expand{
+ 0%{clip-path:polygon(45% 0,55% 0,55% 0,45% 0)}
+ 35%{clip-path:polygon(30% 0,70% 0,63% 28%,37% 28%)}
+ 100%{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+}
 @keyframes ribbon-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:650px){
  .home-page .home-main{padding-top:42px}
  .home-page .text-hero>div,.home-page .text-about .about-copy{border-radius:14px;padding:20px}
  .home-page #departments .section-heading{padding:16px 20px}
+}
+/* Tinted glass keeps each identity in the accent edge, while the seven
+   background bands remain visible through the cards. Dark copy stays legible. */
+.home-page .dept-card[data-department]{
+ background:rgba(255,255,255,.84);
+ background:color-mix(in srgb,var(--soft) 82%,transparent);
+ border-top-color:var(--accent)
+}
+.home-page .dept-card[data-department] h3,.home-page .dept-card[data-department] .dept-top{color:#18202b}
+.home-page .dept-card[data-department] p{color:#34404b}
+.home-page .dept-card[data-department]:hover,.home-page .dept-card[data-department]:focus-visible{
+ background:rgba(255,255,255,.92);
+ background:color-mix(in srgb,var(--soft) 90%,transparent);
+ box-shadow:inset 0 0 0 2px var(--accent)
+}
+.home-page .dept-card[data-department]:focus-visible{outline:3px solid #18202b;outline-offset:3px}
+/* Quiet liquid-glass treatment. Opaque-enough fallback is the default;
+   blur is enhancement, never a prerequisite for readable text. */
+.home-page .text-hero>div,.home-page .text-about .about-copy,
+.home-page #departments .section-heading,.home-page .dept-card[data-department],.home-page .footer{
+ background-image:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,0) 45%,rgba(255,255,255,.12));
+ border-color:rgba(255,255,255,.65);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(255,255,255,.18),0 10px 28px rgba(24,32,43,.08)
+}
+.home-page .dept-card[data-department]{border-top-color:var(--accent)}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+ .home-page .text-hero>div,.home-page .text-about .about-copy,
+ .home-page #departments .section-heading,.home-page .dept-card[data-department],.home-page .footer{
+  -webkit-backdrop-filter:blur(12px) saturate(115%);backdrop-filter:blur(12px) saturate(115%)
+ }
+}
+.home-page .dept-card[data-department]:hover,.home-page .dept-card[data-department]:focus-visible{
+ box-shadow:inset 0 0 0 2px var(--accent),inset 0 1px 0 #fff,0 12px 30px rgba(24,32,43,.12)
 }
