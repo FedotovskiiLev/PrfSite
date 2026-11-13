@@ -13,3 +13,15 @@ assert.equal(els['time-label'].textContent,'02:03');
 assert.equal(els['food-time'].attrs['aria-valuetext'],'02:03');
 els['time-now'].events.click();assert(Number(els['food-time'].value)>=0&&Number(els['food-time'].value)<1440);
 console.log('PASS: no-map-SDK fallback, empty verified venues, hidden profile, timeline/ARIA, Moscow Now. DOM adapter only.');
+// A loaded map must retain source attribution but not the default SVG flag.
+let prefix, tileOptions, center;
+const map={setView(c){center=c;return this;},attributionControl:{setPrefix(p){prefix=p;}}};
+const L={map:()=>map,tileLayer:(_url,opts)=>{tileOptions=opts;return {addTo:()=>({on(){}})};}};
+context.window.L=L;context.L=L;
+vm.runInNewContext(fs.readFileSync(__dirname+'/assets/food.js','utf8'),context);
+assert(prefix.includes('https://leafletjs.com'));
+assert(!prefix.includes('<svg')&&!prefix.includes('flag'));
+assert(tileOptions.attribution.includes('https://www.openstreetmap.org/copyright'));
+assert(tileOptions.attribution.includes('contributors'));
+assert.deepEqual(center,context.window.FoodMapData.campus.center);
+console.log('PASS: loaded map retains OSM/Leaflet text attribution without flag. DOM adapter only.');

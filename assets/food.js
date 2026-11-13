@@ -47,6 +47,8 @@
     now(); return;
   }
   const map = L.map('food-map',{scrollWheelZoom:false}).setView(data.campus.center,data.campus.zoom);
+  // Keep a plain-text Leaflet credit without its default flag icon.
+  map.attributionControl.setPrefix('<a href="https://leafletjs.com" title="A JavaScript library for interactive maps">Leaflet</a>');
   const tiles = L.tileLayer(data.provider.tileUrl, {maxZoom:data.provider.maxZoom, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
   let errors = 0;
   tiles.on('tileerror',() => { errors++; $('map-load-status').textContent = 'Часть карты недоступна из-за сети. Попробуйте открыть её отдельно.'; });
