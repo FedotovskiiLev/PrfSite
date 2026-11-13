@@ -54,7 +54,7 @@ export function applyRouteResult(r,result,player,canReach=(a,b)=>sweepFraction(a
 }
 export function createFoodGame(options = {}) {
   let {width=960,height=600}=options;
-  const {playerRadius=16,roachRadius=8,playerSpeed=140,population=40,rareChance=.08,blackUnlockGinger=35,
+  const {playerRadius=16,roachRadius=8,playerSpeed=140,population=40,rareChance=.08,blackUnlockGinger=15,
     sanitizerUnlockEaten=10,sanitizerInterval=7,sanitizerMinTravel=500,sanitizerMaxTravel=1100,sanitizerLimit=16,
     random=seededRandom(options.seed??1),step=1/120,lowVisibleCount=6}=options;
   for(const [key,value] of Object.entries({width,height,playerRadius,roachRadius,playerSpeed,step}))positive(value,key);
@@ -124,7 +124,7 @@ export function createFoodGame(options = {}) {
     if(eaten<sanitizerUnlockEaten)return;
     const previousSerial=sanitizerSerial;
     if(!sanitizerStarted){sanitizerStarted=true;sanitizerTimer=sanitizerInterval;if(sanitizers.length<sanitizerLimit)spawnSanitizer();}
-    else{sanitizerTimer-=step;if(sanitizerTimer<=0){if(sanitizers.length<sanitizerLimit)spawnSanitizer();sanitizerTimer+=sanitizerInterval;}}
+    else{sanitizerTimer=Math.max(0,sanitizerTimer-step);const allowed=1+Math.floor((eaten-sanitizerUnlockEaten)/5);if(sanitizerTimer<=0&&sanitizerSerial<allowed){spawnSanitizer();sanitizerTimer=sanitizerInterval;}}
     for(const r of sanitizers){
       if(r.id>previousSerial)continue;
       const rx=r.x,ry=r.y;
@@ -146,11 +146,9 @@ export function createFoodGame(options = {}) {
         if(r.remainingTravel<=1e-9){r.remainingTravel=0;r.phase='idle';tiredSanitizers++;navigation.cancel(r.id);}
       }
       // Actual path is movement up to moveTime, then rest, not a slower full-tick drift.
-      if(bothStoppingHit(px,py,player.x,player.y,rx,ry,r.x,r.y,playerRadius+r.radius,playerMoveFraction,moveTime/step)){gameOver=true;break;}
+      if(r.phase==='walk'&&bothStoppingHit(px,py,player.x,player.y,rx,ry,r.x,r.y,playerRadius+r.radius,playerMoveFraction,moveTime/step)){gameOver=true;break;}
     }
-    // Retire only distant OFFSCREEN exhausted entities; never wake or hide visible ones.
-    const far=Math.max(width,height)*2+sanitizerMaxTravel;
-    for(let i=sanitizers.length-1;i>=0;i--){const r=sanitizers[i];if(r.phase==='idle'&&!visible(r)&&Math.hypot(r.x-player.x,r.y-player.y)>far)sanitizers.splice(i,1);}
+    // Exhausted sanitarians stay seated in the world; thresholds never respawn replacements.
   }
   function recycleFar(){
     const distance=Math.max(width,height)*2+playerSpeed*3;
@@ -198,7 +196,7 @@ export function createFoodGame(options = {}) {
     },
     // Resize changes only the camera rectangle. Existing world positions/IDs never move.
     resizeViewport(w,h){healthy();positive(w,'width');positive(h,'height');width=w;height=h;},
-    snapshot(){healthy();return {width,height,navigation:{pending:navigation.pending,workUsed:navigation.used+adoptionWork,searchWork:navigation.used,adoptionWork,budget:96},time:ticks*step,eaten,tiredSanitizers,gameOver,sanitizers:sanitizers.map(r=>({...r,route:r.route.map(p=>({...p})),visible:visible(r)})),gingerEaten,blackUnlockGinger,blackUnlocked:gingerEaten>=blackUnlockGinger,player:{...player},
+    snapshot(){healthy();return {width,height,navigation:{pending:navigation.pending,workUsed:navigation.used+adoptionWork,searchWork:navigation.used,adoptionWork,budget:96},time:ticks*step,score:gingerEaten*10+(eaten-gingerEaten)*50+tiredSanitizers*5,eaten,tiredSanitizers,gameOver,sanitizers:sanitizers.map(r=>({...r,route:r.route.map(p=>({...p})),visible:visible(r)})),gingerEaten,blackUnlockGinger,blackUnlocked:gingerEaten>=blackUnlockGinger,player:{...player},
       camera:{x:player.x,y:player.y,width,height},visibleCount:roaches.filter(visible).length,
       roaches:roaches.map(r=>({...r,visible:visible(r)})),interpolation:accumulator/step};}
   };
