@@ -54,7 +54,7 @@ export function applyRouteResult(r,result,player,canReach=(a,b)=>sweepFraction(a
 }
 export function createFoodGame(options = {}) {
   let {width=960,height=600}=options;
-  const {playerRadius=16,roachRadius=8,playerSpeed=140,population=40,rareChance=.14,blackUnlockGinger=15,
+  const {playerRadius=16,roachRadius=8,playerSpeed=140,population=40,rareChance=.30,blackUnlockGinger=15,
     sanitizerUnlockEaten=10,sanitizerInterval=7,sanitizerMinTravel=500,sanitizerMaxTravel=1100,sanitizerLimit=16,
     random=seededRandom(options.seed??1),step=1/120,lowVisibleCount=6}=options;
   for(const [key,value] of Object.entries({width,height,playerRadius,roachRadius,playerSpeed,step}))positive(value,key);
