@@ -7,7 +7,7 @@ function add(parent,tag,attrs){const n=document.createElementNS(ns,tag);for(cons
 // retain the other two white tiles and the original light grout/texture.
 // A light blue wash keeps the checker readable without competing with actors.
 // These two static shapes are created once, never in the camera update loop.
-for(const offset of [1.5,25.5])add(pattern,'rect',{x:offset,y:offset,width:21,height:21,fill:'#3f92ce',opacity:.22,'pointer-events':'none','data-floor-tint':'blue'});
+for(const offset of [1.5,25.5])add(pattern,'rect',{x:offset,y:offset,width:21,height:21,fill:'#3f92ce',opacity:.13,'pointer-events':'none','data-floor-tint':'blue'});
 function hash(x,y){let n=Math.imul(x,0x1f123bb5)^Math.imul(y,0x5f356495);n^=n>>>16;n=Math.imul(n,0x45d9f3b);return(n^(n>>>16))>>>0}
 function meal(parent,x,y,variant){const g=add(parent,'g',{transform:`translate(${x} ${y}) rotate(${variant?12:-9})`});
  add(g,'ellipse',{cx:.6,cy:1.4,rx:12.2,ry:11.8,fill:'#302820',opacity:.18});
