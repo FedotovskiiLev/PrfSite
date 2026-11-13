@@ -38,6 +38,41 @@ export function stopAwareRoachHit(px,py,nx,ny,rx,ry,sx,sy,radius,pf,a=0,b=1){
  const u=at(a),v=at(b),local=clamp((pf-a)/(b-a),0,1);
  return bothStoppingHit(px+(nx-px)*u,py+(ny-py)*u,px+(nx-px)*v,py+(ny-py)*v,rx,ry,sx,sy,radius,local,1);
 }
+/** Black-roach fatigue is reaction latency in seconds, not speed or invulnerability. */
+export const BLACK_CHALLENGE_INCREMENT=.12;
+export const BLACK_THREAT_MARGIN=42;
+/** Keep the whole planned step outside the student's current contact circle.
+ * Re-evaluate as the student moves; a moving student can still intercept and eat it.
+ * Fixed candidate count keeps crowd work bounded and does not consume orange RNG.
+ */
+export function safeBlackStepAngle(r,player,distance,preferred=r.angle){
+ const radius=r.radius+player.radius;
+ const away=Math.atan2(r.y-player.y,r.x-player.x);
+ const candidates=[preferred,away+.65,away-.65,away];
+ for(const angle of candidates){
+  const x=r.x+Math.cos(angle)*distance,y=r.y+Math.sin(angle)*distance;
+  if(!touchesDuringStep(player.x,player.y,player.x,player.y,r.x,r.y,x,y,radius))return angle;
+ }
+ // Already touching: do not rescue an overlapping roach; swept capture handles it.
+ return preferred;
+}
+/** One bounded close-threat reaction. Extra steps use the normal walk speed/duration.
+ * A completed dodge must end before another starts; waiting time only accrues while
+ * threatened, so a long absence cannot bank an instant reaction for a tired roach.
+ */
+export function reactBlackRoach(r,player,dt,speed){
+ if(r.kind!=='black')return false;
+ r.challenge??=0;r.reactionElapsed??=0;
+ const distance=Math.hypot(r.x-player.x,r.y-player.y),contact=r.radius+player.radius;
+ if(distance<=contact||distance>contact+BLACK_THREAT_MARGIN){r.reactionElapsed=0;return false;}
+ if(r.evading)return false;
+ r.reactionElapsed+=dt;
+ if(r.reactionElapsed+1e-12<r.challenge)return false;
+ r.angle=safeBlackStepAngle(r,player,speed*r.walkDuration,Math.atan2(r.y-player.y,r.x-player.x)+.65);
+ r.phase='walk';r.remaining=r.walkDuration;r.directed=false;r.evading=true;
+ r.reactionElapsed=0;r.challenge+=BLACK_CHALLENGE_INCREMENT;
+ return true;
+}
 /** Apply a completed search without discarding a still-safe old path. */
 export function applyRouteResult(r,result,player,canReach=(a,b)=>sweepFraction(a.x,a.y,b.x,b.y,a.radius)===1){
  r.routeStatus=result.status;
@@ -93,7 +128,9 @@ export function createFoodGame(options = {}) {
     }
     const r={id:++serial,x:player.x+x,y:player.y+y,radius:roachRadius,
       kind:(rng()<rareChance && gingerEaten>=blackUnlockGinger)?'black':'ginger',phase:'idle',angle:rng()*Math.PI*2,
-      remaining:0,walkDuration:0,directed:false};durations(r);return r;
+      remaining:0,walkDuration:0,directed:false};
+    if(r.kind==='black'){r.challenge=0;r.reactionElapsed=0;r.evading=false;}
+    durations(r);return r;
   }
   for(let i=0;i<population;i++)roaches.push(spawn());
   function transition(r,visibleCount){
@@ -106,7 +143,7 @@ export function createFoodGame(options = {}) {
         const angle=Math.atan2(ty-r.y,tx-r.x);
         r.angle=Math.abs(Math.atan2(Math.sin(angle-r.angle),Math.cos(angle-r.angle)))<.001?angle+.001:angle;
       }else r.angle=(r.angle+.2+rng()*(Math.PI*2-.4))%(Math.PI*2);
-    }else{r.phase='idle';r.directed=false;durations(r);}
+    }else{r.phase='idle';r.directed=false;if(r.kind==='black')r.evading=false;durations(r);}
   }
   function spawnSanitizer(){
     let margin=playerRadius+48;const side=Math.floor(rng()*4),along=rng()*2-1;
@@ -187,10 +224,16 @@ export function createFoodGame(options = {}) {
     const visibleCount=roaches.filter(visible).length;
     for(let i=0;i<roaches.length;i++){
       const r=roaches[i];let remaining=step,elapsed=0,hit=false;
+      // Read the player at tick start, not its future endpoint: no clairvoyance.
+      const threat={x:px,y:py,radius:playerRadius};
+      reactBlackRoach(r,threat,step,playerSpeed*1.5);
       while(remaining>1e-12){
         if(r.remaining<=1e-12)transition(r,visibleCount);
         const dt=Math.min(remaining,r.remaining),rx=r.x,ry=r.y;
-        if(r.phase==='walk'){r.x+=Math.cos(r.angle)*playerSpeed*1.5*dt;r.y+=Math.sin(r.angle)*playerSpeed*1.5*dt;}
+        if(r.phase==='walk'){
+          if(r.kind==='black')r.angle=safeBlackStepAngle(r,threat,playerSpeed*1.5*r.remaining);
+          r.x+=Math.cos(r.angle)*playerSpeed*1.5*dt;r.y+=Math.sin(r.angle)*playerSpeed*1.5*dt;
+        }
         const a=elapsed/step,b=(elapsed+dt)/step;
         if(stopAwareRoachHit(px,py,player.x,player.y,rx,ry,r.x,r.y,playerRadius+roachRadius,playerMoveFraction,a,b))hit=true;
         elapsed+=dt;remaining-=dt;r.remaining-=dt;if(hit)break;
