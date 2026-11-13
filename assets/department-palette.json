@@ -1,0 +1,51 @@
+{
+  "food": {
+    "name": "Физтех.Еда",
+    "accent": "#147AD6",
+    "brand": "#1264AD",
+    "soft": "#EAF3FF",
+    "on": "#FFFFFF"
+  },
+  "green": {
+    "name": "GreenTech",
+    "accent": "#2F9357",
+    "brand": "#246B40",
+    "soft": "#E9F5EC",
+    "on": "#FFFFFF"
+  },
+  "events": {
+    "name": "КМО",
+    "accent": "#E34892",
+    "brand": "#A92462",
+    "soft": "#FDEBF3",
+    "on": "#FFFFFF"
+  },
+  "travel": {
+    "name": "Физтех тур",
+    "accent": "#F2CA36",
+    "brand": "#785B00",
+    "soft": "#FFF7D7",
+    "on": "#302800"
+  },
+  "promo": {
+    "name": "Физтех Промо",
+    "accent": "#DF3E3E",
+    "brand": "#B3262A",
+    "soft": "#FDECEC",
+    "on": "#FFFFFF"
+  },
+  "legal": {
+    "name": "Правовой",
+    "accent": "#168B8D",
+    "brand": "#116B6D",
+    "soft": "#E6F5F4",
+    "on": "#FFFFFF"
+  },
+  "culture": {
+    "name": "Культурный физтех",
+    "accent": "#8853CA",
+    "brand": "#6D3AA6",
+    "soft": "#F2ECFA",
+    "on": "#FFFFFF"
+  }
+}
