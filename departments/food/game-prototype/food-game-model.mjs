@@ -127,8 +127,12 @@ export function createFoodGame(options = {}) {
   function sanitizerTick(px,py,playerMoveFraction){
     if(eaten<sanitizerUnlockEaten)return;
     const previousSerial=sanitizerSerial;
-    if(!sanitizerStarted){sanitizerStarted=true;sanitizerTimer=sanitizerInterval;if(sanitizers.length<sanitizerLimit)spawnSanitizer();}
-    else{sanitizerTimer=Math.max(0,sanitizerTimer-step);const allowed=1+Math.floor((eaten-sanitizerUnlockEaten)/5);if(sanitizerTimer<=0&&sanitizerSerial<allowed){spawnSanitizer();sanitizerTimer=sanitizerInterval;}}
+    const targetActive=1+Math.floor((eaten-sanitizerUnlockEaten)/5);
+    const active=sanitizers.reduce((n,r)=>n+(r.phase==='walk'?1:0),0);
+    sanitizerTimer=Math.max(0,sanitizerTimer-step);
+    // Fill the active quota, not lifetime births. Short stagger lets pursuers coexist
+    // before their finite travel expires, without spawning a whole crowd in one tick.
+    if(active<targetActive&&sanitizerTimer<=0){spawnSanitizer();sanitizerStarted=true;sanitizerTimer=Math.min(sanitizerInterval,.75);}
     for(const r of sanitizers){
       if(r.id>previousSerial)continue;
       const rx=r.x,ry=r.y;
@@ -152,7 +156,10 @@ export function createFoodGame(options = {}) {
       // Actual path is movement up to moveTime, then rest, not a slower full-tick drift.
       if(r.phase==='walk'&&bothStoppingHit(px,py,player.x,player.y,rx,ry,r.x,r.y,playerRadius+r.radius,playerMoveFraction,moveTime/step)){gameOver=true;break;}
     }
-    // Exhausted sanitarians stay seated in the world; thresholds never respawn replacements.
+    // Keep seated actors nearby, but bound the retained distant history during long games.
+    // Never remove a visible exhausted actor or an active pursuer.
+    let retained=sanitizers.filter(r=>r.phase==='idle').length;
+    for(let i=0;i<sanitizers.length&&retained>128;){const r=sanitizers[i];if(r.phase==='idle'&&!visible(r)&&Math.hypot(r.x-player.x,r.y-player.y)>Math.max(width,height)+600){sanitizers.splice(i,1);retained--;}else i++;}
   }
   function recycleFar(){
     // A screen-shaped local population, not a huge circular tail several screens behind.
