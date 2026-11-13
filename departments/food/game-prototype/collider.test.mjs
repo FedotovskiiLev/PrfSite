@@ -2,8 +2,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {blocked,sweepFraction,moveWithTables,tablesInBounds,TABLE_ART_GEOMETRY} from './table-geometry.mjs';
 const source=()=>[{minX:0,maxX:100,minY:0,maxY:50}];
-test('visible PNG bbox includes SVG default aspect fit, no phantom border',()=>{
- assert.deepEqual(TABLE_ART_GEOMETRY,{minX:-48,maxX:48,minY:-348/13,maxY:348/13,cornerRadius:42/13});
+test('coffee PNG visible bbox and rounded contour match collider',()=>{
+ assert.deepEqual(TABLE_ART_GEOMETRY,{minX:-48,maxX:48,minY:-348/13,maxY:348/13,cornerRadius:19.87});
  for(const r of tablesInBounds(-900,-900,900,900)){assert(Math.abs(r.maxX-r.minX-96)<1e-8);assert(Math.abs(r.maxY-r.minY-696/13)<1e-8);}
 });
 test('radius retained at sides, exact contact can depart or slide tangent',()=>{

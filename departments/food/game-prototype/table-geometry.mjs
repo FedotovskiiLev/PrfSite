@@ -1,8 +1,8 @@
 // Same world hash/300-unit cells/table positions as environment.js, no rendering.
-// Grab3D PNG alpha support [152,198,360,314), source 512-square.
-// Render square size 512*6/13: visible bounds x +/-48, y +/-348/13.
-// Seven source pixels approximate the small rounded texture corners.
-export const TABLE_ART_GEOMETRY=Object.freeze({minX:-48,maxX:48,minY:-348/13,maxY:348/13,cornerRadius:42/13});
+// Grab3D Coffee Table render: alpha support [24,99,360,285), source 384-square.
+// Render image width 109.714285714, height 110.53101737: bounds x +/-48, y +/-348/13.
+// Rounded rectangle fits the visible tabletop contour within approximately 1 world unit.
+export const TABLE_ART_GEOMETRY=Object.freeze({minX:-48,maxX:48,minY:-348/13,maxY:348/13,cornerRadius:19.87});
 export function tableHash(x,y){let n=Math.imul(x,0x1f123bb5)^Math.imul(y,0x5f356495);n^=n>>>16;n=Math.imul(n,0x45d9f3b);return(n^(n>>>16))>>>0;}
 export function tablesInBounds(minX,minY,maxX,maxY){const out=[];for(let y=Math.floor((minY-220)/300);y<=Math.floor((maxY+50)/300);y++)for(let x=Math.floor((minX-240)/300);x<=Math.floor((maxX+50)/300);x++){const h=tableHash(x,y);if(h%3===0)continue;const px=x*300+60+h%130,py=y*300+60+(h>>>8)%130;if(Math.hypot(px,py)<110)continue;const r={minX:px+TABLE_ART_GEOMETRY.minX,maxX:px+TABLE_ART_GEOMETRY.maxX,minY:py+TABLE_ART_GEOMETRY.minY,maxY:py+TABLE_ART_GEOMETRY.maxY,cornerRadius:TABLE_ART_GEOMETRY.cornerRadius};if(r.maxX>=minX&&r.minX<=maxX&&r.maxY>=minY&&r.minY<=maxY)out.push(r);}return out;}
 // Circle versus visible rectangle, not a rectangle expanded at its corners.
@@ -43,3 +43,4 @@ export function findRoute(start,goal,radius,source=tablesInBounds){const nearby=
 const sx=Math.round(start.x/grid),sy=Math.round(start.y/grid);for(let y=sy-1;y<=sy+1;y++)for(let x=sx-1;x<=sx+1;x++){const p=point(x,y);if(!blocked(p.x,p.y,radius,source)&&clear(start,p))add(x,y,Math.hypot(p.x-start.x,p.y-start.y),null);}
 while(open.length&&visits++<6000){let index=0;for(let i=1;i<open.length;i++)if(open[i].f<open[index].f)index=i;const n=open.splice(index,1)[0];if(nodes.get(n.key)!==n||n.closed)continue;n.closed=true;const p=point(n.x,n.y);if(heuristic(p)<80&&clear(p,goal)){const result=[goal];let v=n;while(v){result.unshift(point(v.x,v.y));v=v.parent;}return result;}for(const [dx,dy]of [[1,0],[0,1],[-1,0],[0,-1],[1,1],[-1,1],[-1,-1],[1,-1]]){const x=n.x+dx,y=n.y+dy;if(x<minX||x>maxX||y<minY||y>maxY)continue;const q=point(x,y);if(clear(p,q))add(x,y,n.g+Math.hypot(dx,dy)*grid,n);}}
 return[];}
+
