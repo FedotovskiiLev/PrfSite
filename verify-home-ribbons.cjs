@@ -1,0 +1,15 @@
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const html=fs.readFileSync('index.html','utf8');
+const css=fs.readFileSync('assets/home-ribbons.css','utf8');
+const palette=JSON.parse(fs.readFileSync('assets/department-palette.json','utf8'));
+const ribbons=[...html.matchAll(/<path pathLength="1" data-ribbon="([^"]+)"[^>]+stroke="([^"]+)"/g)];
+assert.equal(ribbons.length,7);
+assert.equal(new Set(ribbons.map(r=>r[1])).size,7);
+for(const [,id,color] of ribbons)assert.equal(color,palette[id].accent);
+assert.match(html,/<\/header><div class="home-ribbons" aria-hidden="true">/);
+assert.match(css,/@media\(prefers-reduced-motion:no-preference\)/);
+assert.doesNotMatch(css,/infinite/);
+assert.match(css,/pointer-events:none/);
+assert.match(css,/@media\(max-width:650px\)/);
+assert.match(html,/<main id="main"/);
+console.log('PASS: seven palette colors, homepage placement, one-shot motion, reduced-motion and mobile rules; navigation preserved.');
