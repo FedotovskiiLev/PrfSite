@@ -1,0 +1,15 @@
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+
+To the extent possible under law, Grab3D has waived all copyright and related or neighboring rights to the
+sprites, sprite sheets, atlases and images in this package. This work is published from: Germany.
+
+https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Origin / AI disclosure
+----------------------
+Method: rendered from procedural 3D models (no AI-generated geometry, textures or images, AI-assisted code)
+The sprites were rendered in Blender from Grab3D 3D models that were built procedurally with Blender scripts.
+The modelling and rendering scripts were written with the help of an AI coding assistant. No generative AI
+model produced the geometry, textures or images directly.
+If your platform asks whether AI was used in the creation process, note that the scripts were written with an
+AI coding assistant.

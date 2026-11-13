@@ -1,0 +1,2 @@
+export function directional(x,y,dead=0){if(!Number.isFinite(x)||!Number.isFinite(y)||!Number.isFinite(dead)||dead<0)return{x:0,y:0};const n=Math.hypot(x,y);return n<=dead?{x:0,y:0}:{x:x/n,y:y/n};}
+export function keyboard(keys){return directional(Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft')),Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup')));}
