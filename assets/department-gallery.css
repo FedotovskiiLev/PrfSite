@@ -8,4 +8,4 @@
   .department-gallery .carousel-viewport { height: 300px; }
 }
 /* Canteen summaries keep their content, with photography on its own wide row. */
-.two-col > .department-gallery { grid-column: 1 / -1; }
+.text-photo-layout > .department-gallery { grid-column: 1 / -1; }
