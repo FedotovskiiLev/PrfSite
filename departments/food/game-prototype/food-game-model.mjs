@@ -144,13 +144,15 @@ export function createFoodGame(options = {}) {
         const target=r.route[0]??r;
         const dx=target.x-r.x,dy=target.y-r.y,n=Math.hypot(dx,dy);
         r.angle=Math.atan2(dy,dx);
-        const speed=playerSpeed*.8;
-        const d=Math.min(speed*step,r.remainingTravel,n);
+        // Use visibility at tick start: never boost an actor already on screen.
+        const distant=Math.abs(rx-px)>width/2+r.radius||Math.abs(ry-py)>height/2+r.radius;
+        const speed=playerSpeed*(distant?1.35:.8),travelCost=distant?.2:1;
+        const d=Math.min(speed*step,r.remainingTravel/travelCost,n);
         moveTime=d/speed;
         const next=n>0?moveWithTables(rx,ry,rx+dx/n*d,ry+dy/n*d,playerRadius):{x:rx,y:ry};
         r.x=next.x;r.y=next.y;
         const actual=Math.hypot(r.x-rx,r.y-ry);moveTime=actual/speed;
-        r.remainingTravel=Math.max(0,r.remainingTravel-actual);
+        r.remainingTravel=Math.max(0,r.remainingTravel-actual*travelCost);
         if(r.remainingTravel<=1e-9){r.remainingTravel=0;r.phase='idle';tiredSanitizers++;navigation.cancel(r.id);}
       }
       // Actual path is movement up to moveTime, then rest, not a slower full-tick drift.
