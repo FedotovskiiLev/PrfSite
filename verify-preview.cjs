@@ -7,7 +7,8 @@ const context={document:{getElementById:id=>els[id],createElement:()=>new El()},
 context.window.addEventListener=()=>{};
 vm.runInNewContext(fs.readFileSync(__dirname+'/assets/food.js','utf8'),context);
 assert(els['map-load-status'].textContent.includes('недоступен'));
-assert(els['map-status'].textContent.includes('Демо'));
+assert.equal(els['map-status'].textContent, undefined, 'Removed summary is not rendered');
+assert.equal(els['map-load-status'].hidden, false, 'SDK errors remain accessible');
 assert.equal(els['place-name'].textContent,'Столовая в ГК');
 assert.equal(els['food-map'].beforeElement, undefined, 'No duplicate cafeteria buttons above the map');
 assert(els['place-hours'].textContent.includes('08:00–17:30'));
@@ -20,9 +21,10 @@ els['time-now'].events.click();assert(Number(els['food-time'].value)>=0&&Number(
 console.log('PASS: no-map-SDK fallback, two approximate demo venues, linked demo profile, timeline/ARIA, Moscow Now. DOM adapter only.');
 // A loaded map must retain source attribution but not the default SVG flag.
 let prefix, tileOptions, center, mapOptions, minZoom;
+const tileEvents={};
 const drawn=[];
 const map={setView(c){center=c;return this;},invalidateSize(){},getBoundsZoom(){return 17;},setMinZoom(z){minZoom=z;},getZoom(){return 17;},setZoom(){},panInsideBounds(){},attributionControl:{setPrefix(p){prefix=p;}}};
-const L={map:(_id,opts)=>{mapOptions=opts;return map;},circleMarker:(coords,opts)=>{const marker={coords,opts,events:{},el:new El(),addTo(){return this;},bindTooltip(){return this;},on(name,fn){this.events[name]=fn;return this;},getElement(){return this.el;},setStyle(style){this.style=style;},setTooltipContent(){}};drawn.push(marker);return marker;},tileLayer:(_url,opts)=>{tileOptions=opts;return {addTo:()=>({on(){}})};}};
+const L={map:(_id,opts)=>{mapOptions=opts;return map;},circleMarker:(coords,opts)=>{const marker={coords,opts,events:{},el:new El(),addTo(){return this;},bindTooltip(){return this;},on(name,fn){this.events[name]=fn;return this;},getElement(){return this.el;},setStyle(style){this.style=style;},setTooltipContent(){}};drawn.push(marker);return marker;},tileLayer:(_url,opts)=>{tileOptions=opts;return {addTo:()=>({on(name,fn){tileEvents[name]=fn;}})};}};
 context.window.L=L;context.L=L;
 vm.runInNewContext(fs.readFileSync(__dirname+'/assets/food.js','utf8'),context);
 assert.equal(prefix,false);
@@ -42,3 +44,20 @@ drawn[0].el.events.keydown({key:'Enter',preventDefault(){}});assert.equal(els['p
 drawn[1].el.events.keydown({key:' ',preventDefault(){}});assert.equal(els['place-name'].textContent,'Столовая КПМ');
 assert.equal(els['food-map'].beforeElement, undefined);
 console.log('PASS: two clickable/keyboard markers, open/closed colors and campus bounds/minZoom adapter.');
+
+// Successful loading stays silent; failures are still visible and announced.
+tileEvents.load();
+assert.equal(els['map-load-status'].hidden, true);
+assert.equal(els['map-load-status'].textContent, '');
+assert.equal(els['map-status'].textContent, undefined);
+tileEvents.tileerror();
+assert.equal(els['map-load-status'].hidden, false);
+assert(els['map-load-status'].textContent.includes('недоступна'));
+tileEvents.load();
+assert.equal(els['map-load-status'].hidden, false, 'Partial tile failure is not concealed');
+drawn[1].events.click();
+assert.equal(els['place-link'].hidden, false);
+assert.equal(els['place-link'].href, 'canteens/2.html');
+drawn[0].events.click();
+assert.equal(els['place-link'].href, 'canteens/1.html');
+console.log('PASS: removed map summaries, silent success, accessible errors and both profile links.');
