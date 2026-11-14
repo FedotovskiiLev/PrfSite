@@ -61,3 +61,16 @@ assert.equal(els['place-link'].href, 'canteens/2.html');
 drawn[0].events.click();
 assert.equal(els['place-link'].href, 'canteens/1.html');
 console.log('PASS: removed map summaries, silent success, accessible errors and both profile links.');
+// Time-of-day thumb and requested layout.
+for (const [minute,period] of [[0,'night'],[359,'night'],[360,'day'],[1079,'day'],[1080,'night'],[1439,'night']]) {
+  els['food-time'].value=minute; els['food-time'].events.input();
+  assert.equal(els['food-time'].attrs['data-period'],period);
+}
+const page=fs.readFileSync(__dirname+'/departments/food/index.html','utf8');
+assert(page.indexOf('class="time-controls"') < page.indexOf('id="food-map"'));
+assert(!page.includes('Карта кампуса и демонстрационные расписания.'));
+assert(page.indexOf('for="food-time">Время в Москве') < page.indexOf('id="time-now"'));
+assert(page.indexOf('id="time-now"') < page.indexOf('id="time-label"'));
+assert(page.indexOf('food-description-heading') > page.indexOf('Что нового?'));
+assert(page.indexOf('food-description-heading') < page.indexOf('id="map-heading"'));
+console.log('PASS: day/night thumb boundaries, controls above map, inline Now/time, department description order.');

@@ -19,6 +19,8 @@
     const minute = Number(slider.value), day = model.localClock(new Date(),data.timeZone).day;
     $('time-label').textContent = fmt(minute);
     slider.setAttribute('aria-valuetext',fmt(minute));
+    // A simple time-of-day icon, not a seasonal sunrise/sunset forecast.
+    slider.setAttribute('data-period', minute >= 360 && minute < 1080 ? 'day' : 'night');
     for (const venue of data.venues) {
       const status = model.statusAt(venue,day,minute);
       const marker = markers.get(venue.id);
