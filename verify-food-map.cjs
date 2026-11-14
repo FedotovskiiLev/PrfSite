@@ -4,7 +4,7 @@ const model = require('./assets/food-map-model.js');
 const data = require('./assets/food-map-data.js');
 assert.deepEqual(model.validate(data), []);
 assert.equal(data.venues.length, 2);
-assert(data.venues.every(v => v.demo && v.coordinates === null && v.locationStatus === 'unconfirmed'), 'Never fabricate cafeteria coordinates');
+assert(data.venues.every(v => v.demo && model.coordinatesValid(v.coordinates) && v.locationStatus === 'approximate-building' && v.source.startsWith('https://www.openstreetmap.org/way/')), 'Building points must retain source and approximate label');
 const [gk, kpm] = data.venues;
 for (let day = 0; day < 7; day++) {
   for (const [minute, state] of [[479,'closed'],[480,'open'],[1049,'open'],[1050,'closed'],[1439,'closed']])
@@ -33,3 +33,7 @@ assert.deepEqual(model.localClock(new Date('2026-11-15T22:30:00Z')), {day:0,minu
 assert.throws(() => model.statusAt(venue,7,1440), RangeError);
 assert(model.validate({...data,venues:[{id:'x',name:'x',coordinates:[55,37],source:'test',weeklyHours:[[]]}]}).length);
 console.log('PASS: map data schema, coordinates, unknown hours, boundaries, overnight/week wrap, Moscow date; no browser or provider checks.');
+
+for (const v of data.venues) { const [[s,w],[n,e]]=data.campus.bounds; assert(v.coordinates[0]>=s&&v.coordinates[0]<=n&&v.coordinates[1]>=w&&v.coordinates[1]<=e); }
+
+assert(model.validate({...data,campus:{...data.campus,bounds:[[56,38],[55,37]]}}).length);

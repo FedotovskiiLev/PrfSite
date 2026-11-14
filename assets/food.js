@@ -62,13 +62,24 @@
     $('map-load-status').textContent = 'Картографический сервис недоступен. Можно открыть карту по ссылке ниже. Расписания работают независимо от карты.';
     now(); return;
   }
-  const map = L.map('food-map',{scrollWheelZoom:false}).setView(data.campus.center,data.campus.zoom);
+  const map = L.map('food-map',{scrollWheelZoom:false, maxBounds:data.campus.bounds, maxBoundsViscosity:1, minZoom:data.campus.minZoom, maxZoom:data.provider.maxZoom}).setView(data.campus.center,data.campus.zoom);
+  // Keep the visible viewport in the campus area, including wide desktop layouts.
+  function fitCampusViewport() {
+    map.invalidateSize({pan:false});
+    const minZoom = Math.min(data.provider.maxZoom, Math.max(data.campus.minZoom, map.getBoundsZoom(data.campus.bounds, true)));
+    map.setMinZoom(minZoom);
+    if (map.getZoom() < minZoom) map.setZoom(minZoom);
+    map.panInsideBounds(data.campus.bounds, {animate:false});
+  }
+  fitCampusViewport();
+  if (window.ResizeObserver) new window.ResizeObserver(fitCampusViewport).observe($('food-map'));
+  else window.addEventListener('resize',fitCampusViewport);
   // Keep the required map-data attribution without the library prefix.
   map.attributionControl.setPrefix(false);
   const tiles = L.tileLayer(data.provider.tileUrl, {maxZoom:data.provider.maxZoom, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
   let errors = 0;
   tiles.on('tileerror',() => { errors++; $('map-load-status').textContent = 'Часть карты недоступна из-за сети. Попробуйте открыть её отдельно.'; });
-  tiles.on('load',() => { if (!errors) $('map-load-status').textContent = 'OpenStreetMap · центр обзора: кампус МФТИ. Это не отметка столовой.'; });
+  tiles.on('load',() => { if (!errors) $('map-load-status').textContent = 'OpenStreetMap · примерные отметки корпусов, не входов в столовые.'; });
   for (const venue of data.venues) {
     if (!model.coordinatesValid(venue.coordinates)) continue;
     const label = document.createElement('span'); label.textContent = venue.name;

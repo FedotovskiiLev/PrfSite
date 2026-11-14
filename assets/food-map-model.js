@@ -12,6 +12,10 @@
     try { new Intl.DateTimeFormat('en', { timeZone: data.timeZone }).format(); }
     catch (_) { errors.push('Invalid timeZone'); }
     if (data.campus?.center != null && !coordinatesValid(data.campus.center)) errors.push('Invalid campus center');
+    if (data.campus?.bounds != null) {
+      const b = data.campus.bounds;
+      if (!Array.isArray(b) || b.length !== 2 || !b.every(coordinatesValid) || b[0][0] >= b[1][0] || b[0][1] >= b[1][1]) errors.push('Invalid campus bounds');
+    }
     const ids = new Set();
     for (const venue of data.venues) {
       if (!venue.id || ids.has(venue.id)) errors.push('Missing or duplicate venue id');
