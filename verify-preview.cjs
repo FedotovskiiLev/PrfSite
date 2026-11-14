@@ -11,12 +11,13 @@ assert(els['map-status'].textContent.includes('Демо'));
 assert.equal(els['place-name'].textContent,'Столовая в ГК');
 assert.equal(els['food-map'].beforeElement, undefined, 'No duplicate cafeteria buttons above the map');
 assert(els['place-hours'].textContent.includes('08:00–17:30'));
-assert.equal(els['place-link'].hidden,true);
+assert.equal(els['place-link'].hidden,false);
+assert.equal(els['place-link'].href,'canteens/1.html');
 els['food-time'].value=123;els['food-time'].events.input();
 assert.equal(els['time-label'].textContent,'02:03');
 assert.equal(els['food-time'].attrs['aria-valuetext'],'02:03');
 els['time-now'].events.click();assert(Number(els['food-time'].value)>=0&&Number(els['food-time'].value)<1440);
-console.log('PASS: no-map-SDK fallback, two demo venues without guessed positions, hidden profile, timeline/ARIA, Moscow Now. DOM adapter only.');
+console.log('PASS: no-map-SDK fallback, two approximate demo venues, linked demo profile, timeline/ARIA, Moscow Now. DOM adapter only.');
 // A loaded map must retain source attribution but not the default SVG flag.
 let prefix, tileOptions, center, mapOptions, minZoom;
 const drawn=[];

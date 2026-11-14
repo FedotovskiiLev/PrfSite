@@ -7,6 +7,7 @@
     provider: { id: 'osm', tileUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', maxZoom: 19 },
     venues: [
       {
+        profileUrl: 'canteens/1.html',
         id: 'gk', name: 'Столовая в ГК', demo: true,
         coordinates: [55.9295226,37.5181232], locationStatus: 'approximate-building',
         source: 'https://www.openstreetmap.org/way/420503682',
@@ -17,6 +18,7 @@
         hoursLabel: 'Пн–Пт 08:00–17:30 · Сб–Вс закрыто · Москва'
       },
       {
+        profileUrl: 'canteens/2.html',
         id: 'kpm', name: 'Столовая КПМ', demo: true,
         coordinates: [55.9289650,37.5215239], locationStatus: 'approximate-building',
         source: 'https://www.openstreetmap.org/way/230528324',

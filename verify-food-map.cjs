@@ -37,3 +37,13 @@ console.log('PASS: map data schema, coordinates, unknown hours, boundaries, over
 for (const v of data.venues) { const [[s,w],[n,e]]=data.campus.bounds; assert(v.coordinates[0]>=s&&v.coordinates[0]<=n&&v.coordinates[1]>=w&&v.coordinates[1]<=e); }
 
 assert(model.validate({...data,campus:{...data.campus,bounds:[[56,38],[55,37]]}}).length);
+
+const fs = require('node:fs');
+for (const [venue, file] of [[gk, '1.html'], [kpm, '2.html']]) {
+  assert.equal(venue.profileUrl, 'canteens/' + file);
+  const html = fs.readFileSync(__dirname + '/departments/food/canteens/' + file, 'utf8');
+  assert(html.includes('<h1>' + venue.name + '</h1>'));
+  assert(html.includes(venue.hoursLabel));
+  for (const label of ['Демонстрационный профиль', 'Камеры', 'Акты проверок', 'Новости столовой', '../index.html#food-map']) assert(html.includes(label));
+}
+console.log('PASS: both marker profiles match venue names and demo hours; missing real resources explicitly labeled.');
