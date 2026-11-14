@@ -10,19 +10,6 @@
   }
   const fmt = n => `${String(Math.floor(n / 60)).padStart(2,'0')}:${String(n % 60).padStart(2,'0')}`;
   let selected = data.venues[0] || null;
-  // Schedule selection remains available even when tiles fail or locations are unverified.
-  const choices = document.createElement('div');
-  choices.className = 'food-venue-choices';
-  choices.setAttribute('aria-label', 'Демонстрационные столовые');
-  const buttons = new Map();
-  for (const venue of data.venues) {
-    const button = document.createElement('button');
-    button.type = 'button'; button.className = 'button secondary';
-    button.textContent = venue.name;
-    button.addEventListener('click', () => { selected = venue; render(); });
-    choices.append(button); buttons.set(venue.id, button);
-  }
-  $('food-map').before(choices);
   const markers = new Map();
   function render() {
     const minute = Number(slider.value), day = model.localClock(new Date(),data.timeZone).day;
@@ -32,7 +19,6 @@
     for (const venue of data.venues) {
       const status = model.statusAt(venue,day,minute);
       if (status === 'open') openCount++;
-      buttons.get(venue.id)?.setAttribute('aria-pressed', String(selected?.id === venue.id));
       const marker = markers.get(venue.id);
       const label = `${venue.name}: ${status === 'open' ? 'открыто' : status === 'closed' ? 'закрыто' : 'часы неизвестны'}`;
       if (marker) {
