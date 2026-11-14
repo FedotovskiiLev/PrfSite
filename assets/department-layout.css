@@ -1,0 +1,12 @@
+/* Department landing pages extend the established Food/Culture layout. */
+.department-hero h1{color:var(--brand);overflow-wrap:anywhere}
+.department-hero>div{min-width:0}
+.department-symbol{aspect-ratio:1.3;min-height:0;background:var(--soft);border:1px solid var(--line)}
+.department-symbol svg{width:clamp(100px,16vw,190px);height:auto;max-width:100%}
+.department-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.department-detail{padding:28px;border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:20px;background:var(--soft)}
+.department-detail h3{font-size:clamp(23px,2vw,30px);line-height:1.2;margin:18px 0;color:var(--brand);overflow-wrap:anywhere}
+.department-detail p{line-height:1.65;margin:0}
+.department-detail .eyebrow{color:var(--brand)}
+.department-contact{margin:0 0 64px}
+@media(max-width:760px){.department-hero{grid-template-columns:1fr;padding:30px 0;gap:24px}.department-symbol{aspect-ratio:2.2;max-height:220px;transform:none}.department-detail-grid{grid-template-columns:1fr}.department-contact{align-items:flex-start;flex-direction:column}.department-hero h1{font-size:clamp(40px,9vw,64px)}}

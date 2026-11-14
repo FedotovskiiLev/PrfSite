@@ -16,8 +16,13 @@
     for (const venue of data.venues) {
       if (!venue.id || ids.has(venue.id)) errors.push('Missing or duplicate venue id');
       ids.add(venue.id);
-      if (!venue.name || !coordinatesValid(venue.coordinates)) errors.push(`${venue.id}: name/coordinates required`);
-      if (!venue.source) errors.push(`${venue.id}: verified location source required`);
+      if (!venue.name) errors.push(`${venue.id}: name required`);
+      if (venue.coordinates == null) {
+        if (venue.locationStatus !== 'unconfirmed') errors.push(`${venue.id}: missing location must be explicit`);
+      } else {
+        if (!coordinatesValid(venue.coordinates)) errors.push(`${venue.id}: invalid coordinates`);
+        if (!venue.source) errors.push(`${venue.id}: verified location source required`);
+      }
       const week = venue.weeklyHours;
       if (week != null && (!Array.isArray(week) || week.length !== 7 ||
           week.some(day => day !== null && (!Array.isArray(day) || !day.every(intervalValid))))) {

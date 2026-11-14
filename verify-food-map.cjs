@@ -3,7 +3,18 @@ const assert = require('node:assert/strict');
 const model = require('./assets/food-map-model.js');
 const data = require('./assets/food-map-data.js');
 assert.deepEqual(model.validate(data), []);
-assert.equal(data.venues.length, 0, 'No fabricated venue positions');
+assert.equal(data.venues.length, 2);
+assert(data.venues.every(v => v.demo && v.coordinates === null && v.locationStatus === 'unconfirmed'), 'Never fabricate cafeteria coordinates');
+const [gk, kpm] = data.venues;
+for (let day = 0; day < 7; day++) {
+  for (const [minute, state] of [[479,'closed'],[480,'open'],[1049,'open'],[1050,'closed'],[1439,'closed']])
+    assert.equal(model.statusAt(gk,day,minute), day < 5 ? state : 'closed');
+  for (const [minute, state] of [[479,'closed'],[480,'open'],[1379,'open'],[1380,'closed'],[1439,'closed']])
+    assert.equal(model.statusAt(kpm,day,minute), state);
+}
+assert.deepEqual(model.localClock(new Date('2026-11-13T21:00:00Z')), {day:5,minute:0});
+assert(model.validate({...data,venues:[{id:'x',name:'x',coordinates:null}]}).length);
+assert(model.validate({...data,venues:[{id:'x',name:'x',coordinates:[55,37]}]}).length);
 assert.equal(model.coordinatesValid([55, 37]), true);
 assert.equal(model.coordinatesValid([181, 37]), false);
 assert.equal(model.coordinatesValid(['55', 37]), false);

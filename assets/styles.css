@@ -46,3 +46,19 @@ body[data-department] .button.secondary{border-color:var(--brand);color:var(--br
 body[data-department="food"]{--paper:#F7FAFF;--line:#D4E2F2}
 body[data-department="food"] .notice{background:var(--soft)}
 body[data-department="food"] .food-real-map{background:var(--soft);border-color:var(--line)}
+
+/* Keep the selected canteen beside the map, before the secondary controls on phones. */
+body[data-department="food"] .map-layout{column-gap:16px;row-gap:8px;align-items:start;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+body[data-department="food"] .map-layout>div:first-child{display:contents}
+body[data-department="food"] .map-layout>div:first-child>*{grid-column:1;margin-block:0}
+body[data-department="food"] .map-layout #food-map{grid-row:1;min-width:0}
+body[data-department="food"] .map-layout>.place-card{grid-column:2;grid-row:1 / span 5;min-width:0}
+body[data-department="food"] .map-layout .time-controls{padding-top:12px}
+@media(max-width:650px){
+ body[data-department="food"] .map-layout{grid-template-columns:minmax(0,1fr);row-gap:10px}
+ body[data-department="food"] .map-layout>.place-card{grid-column:1;grid-row:2}
+}
+body[data-department="food"] .map-layout:has(.food-venue-choices) .food-venue-choices{grid-column:1;grid-row:1}
+body[data-department="food"] .map-layout:has(.food-venue-choices) #food-map{grid-row:2}
+body[data-department="food"] .map-layout:has(.food-venue-choices)>.place-card{grid-row:2 / span 5}
+@media(max-width:650px){body[data-department="food"] .map-layout:has(.food-venue-choices)>.place-card{grid-row:3}}

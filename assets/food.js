@@ -9,7 +9,20 @@
     return;
   }
   const fmt = n => `${String(Math.floor(n / 60)).padStart(2,'0')}:${String(n % 60).padStart(2,'0')}`;
-  let selected = null;
+  let selected = data.venues[0] || null;
+  // Schedule selection remains available even when tiles fail or locations are unverified.
+  const choices = document.createElement('div');
+  choices.className = 'food-venue-choices';
+  choices.setAttribute('aria-label', 'Демонстрационные столовые');
+  const buttons = new Map();
+  for (const venue of data.venues) {
+    const button = document.createElement('button');
+    button.type = 'button'; button.className = 'button secondary';
+    button.textContent = venue.name;
+    button.addEventListener('click', () => { selected = venue; render(); });
+    choices.append(button); buttons.set(venue.id, button);
+  }
+  $('food-map').before(choices);
   const markers = new Map();
   function render() {
     const minute = Number(slider.value), day = model.localClock(new Date(),data.timeZone).day;
@@ -19,6 +32,7 @@
     for (const venue of data.venues) {
       const status = model.statusAt(venue,day,minute);
       if (status === 'open') openCount++;
+      buttons.get(venue.id)?.setAttribute('aria-pressed', String(selected?.id === venue.id));
       const marker = markers.get(venue.id);
       const label = `${venue.name}: ${status === 'open' ? 'открыто' : status === 'closed' ? 'закрыто' : 'часы неизвестны'}`;
       if (marker) {
@@ -28,10 +42,12 @@
         marker.setTooltipContent(tooltip);
       }
     }
-    $('map-status').textContent = data.venues.length ? `Открыто: ${openCount} из ${data.venues.length}.` : 'Точки столовых ещё не добавлены. Ползунок готов для проверенных расписаний.';
+    $('map-status').textContent = data.venues.length ? `Демо · открыто сегодня: ${openCount} из ${data.venues.length}. Расписание по московскому времени.` : 'Точки столовых ещё не добавлены. Ползунок готов для проверенных расписаний.';
     $('place-name').textContent = selected?.name || 'Столовые на карте';
     $('place-status').textContent = selected ? ({open:'Открыто',closed:'Закрыто',unknown:'Расписание неизвестно'}[model.statusAt(selected,day,minute)] + ` · ${fmt(minute)}`) : 'Здесь появится информация о выбранной столовой.';
     $('place-hours').textContent = selected?.hoursLabel || 'Расписание не предоставлено';
+    const location = $('place-location') || $('place-card').querySelectorAll('dd')[1];
+    if (location) location.textContent = selected?.locationLabel || 'Точная отметка уточняется';
     const link = $('place-link');
     const safeLink = selected?.profileUrl && /^(?:canteens\/|https:\/\/)/.test(selected.profileUrl);
     link.hidden = !safeLink;
@@ -54,6 +70,7 @@
   tiles.on('tileerror',() => { errors++; $('map-load-status').textContent = 'Часть карты недоступна из-за сети. Попробуйте открыть её отдельно.'; });
   tiles.on('load',() => { if (!errors) $('map-load-status').textContent = 'OpenStreetMap · центр обзора: кампус МФТИ. Это не отметка столовой.'; });
   for (const venue of data.venues) {
+    if (!model.coordinatesValid(venue.coordinates)) continue;
     const label = document.createElement('span'); label.textContent = venue.name;
     const marker = L.circleMarker(venue.coordinates,{radius:11,color:'#fff',weight:3,fillOpacity:1,fillColor:'#77746c'}).addTo(map).bindTooltip(label,{className:'food-map-label'});
     marker.on('click',() => { selected=venue; render(); });

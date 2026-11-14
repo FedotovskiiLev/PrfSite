@@ -1,18 +1,26 @@
 // Minimal DOM-adapter test, not a real browser/map-network test.
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
-class El{constructor(){this.value='';this.attrs={};this.events={};this.classList={add:()=>{}};}setAttribute(n,v){this.attrs[n]=v;}removeAttribute(n){delete this.attrs[n];}addEventListener(n,f){this.events[n]=f;}}
-const ids=['food-time','time-label','place-name','place-status','place-hours','place-link','map-status','time-now','map-load-status','food-map'];
+class El{constructor(){this.children=[];this.value='';this.attrs={};this.events={};this.classList={add:()=>{}};}append(el){this.children.push(el);}before(el){this.beforeElement=el;}setAttribute(n,v){this.attrs[n]=v;}removeAttribute(n){delete this.attrs[n];}addEventListener(n,f){this.events[n]=f;}}
+const ids=['food-time','time-label','place-name','place-status','place-hours','place-link','map-status','time-now','map-load-status','food-map','place-location'];
 const els=Object.fromEntries(ids.map(id=>[id,new El()]));
-const context={document:{getElementById:id=>els[id]},window:{FoodMapData:require('./assets/food-map-data.js'),FoodMapModel:require('./assets/food-map-model.js')},Intl,Date};
+const context={document:{getElementById:id=>els[id],createElement:()=>new El()},window:{FoodMapData:require('./assets/food-map-data.js'),FoodMapModel:require('./assets/food-map-model.js')},Intl,Date};
 vm.runInNewContext(fs.readFileSync(__dirname+'/assets/food.js','utf8'),context);
 assert(els['map-load-status'].textContent.includes('недоступен'));
-assert(els['map-status'].textContent.includes('ещё не добавлены'));
+assert(els['map-status'].textContent.includes('Демо'));
+assert.equal(els['place-name'].textContent,'Столовая в ГК');
+const buttons=els['food-map'].beforeElement.children;
+assert.equal(buttons.length,2);
+buttons[1].events.click();
+assert.equal(els['place-name'].textContent,'Столовая КПМ');
+assert(els['place-hours'].textContent.includes('08:00–23:00'));
+assert(els['place-location'].textContent.includes('уточняется'));
+assert.equal(buttons[1].attrs['aria-pressed'],'true');
 assert.equal(els['place-link'].hidden,true);
 els['food-time'].value=123;els['food-time'].events.input();
 assert.equal(els['time-label'].textContent,'02:03');
 assert.equal(els['food-time'].attrs['aria-valuetext'],'02:03');
 els['time-now'].events.click();assert(Number(els['food-time'].value)>=0&&Number(els['food-time'].value)<1440);
-console.log('PASS: no-map-SDK fallback, empty verified venues, hidden profile, timeline/ARIA, Moscow Now. DOM adapter only.');
+console.log('PASS: no-map-SDK fallback, two demo venues without guessed positions, hidden profile, timeline/ARIA, Moscow Now. DOM adapter only.');
 // A loaded map must retain source attribution but not the default SVG flag.
 let prefix, tileOptions, center;
 const map={setView(c){center=c;return this;},attributionControl:{setPrefix(p){prefix=p;}}};

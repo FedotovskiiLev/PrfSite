@@ -1,1 +1,3 @@
 .food-real-map{height:440px;min-height:300px;border-radius:20px;border:1px solid #d9d4c9;background:#f0eee8;isolation:isolate;z-index:0}.food-real-map .leaflet-control-attribution{font-size:11px}.food-real-map .leaflet-container{font:inherit}.food-map-empty{display:grid;place-content:center;padding:28px;text-align:center}.food-map-label{font:600 13px/1.4 system-ui,sans-serif}@media(max-width:600px){.food-real-map{height:360px}}
+
+.food-venue-choices{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}.food-venue-choices button[aria-pressed="true"]{outline:2px solid var(--accent,#3975c6);outline-offset:2px}
