@@ -18,9 +18,7 @@
 .home-page .footer{background:rgba(255,255,255,.78)}
 @media(prefers-reduced-motion:no-preference){
  .home-ribbons path{stroke-dasharray:1;stroke-dashoffset:0;animation:ribbon-descend 3s cubic-bezier(.3,0,.2,1) both}
- .home-page .text-hero>div,.home-page .text-about .about-copy,.home-page #departments .section-heading{
-  animation:ribbon-copy-in .25s ease-out 3s both
- }
+ /* Content is visible by default; measured progressive reveal is optional JS. */
  /* Keyboard navigation must never land on an invisible animated panel. */
  .home-page .text-hero>div:focus-within,.home-page .text-about .about-copy:focus-within{animation:none}
 }
